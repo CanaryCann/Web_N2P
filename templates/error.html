@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Error • Web_N2P{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-5 text-center">
+        <h1 class="display-6 text-danger mb-3">Uh oh!</h1>
+        <p class="lead text-muted">{{ message }}</p>
+        <p class="text-muted">Status code: {{ status_code }}</p>
+        <a class="btn btn-primary" href="{{ url_for('upload_form') }}">Back to upload</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
