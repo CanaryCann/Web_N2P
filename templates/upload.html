@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Upload Nessus Report • Web_N2P{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h1 class="h4 text-primary mb-3">Upload Nessus Export</h1>
+        <p class="text-muted mb-4">
+          Provide a <strong>.nessus</strong> XML export and optional metadata. Web_N2P will parse
+          the findings, build charts, and deliver a Nessus-inspired PDF report.
+        </p>
+        <form action="{{ url_for('generate_report') }}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="file">Nessus Export (.nessus)</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".nessus,application/xml" required />
+            <div class="invalid-feedback">Please select a .nessus file.</div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="report_name">Report name</label>
+              <input class="form-control" type="text" id="report_name" name="report_name" placeholder="Q1 Vulnerability Assessment" required />
+              <div class="invalid-feedback">Provide a report title.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="customer">Customer / Project</label>
+              <input class="form-control" type="text" id="customer" name="customer" placeholder="ACME Corp" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label" for="scan_date">Scan date</label>
+            <input class="form-control" type="date" id="scan_date" name="scan_date" />
+          </div>
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Generate Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  (() => {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        },
+        false
+      );
+    });
+  })();
+</script>
+{% endblock %}
