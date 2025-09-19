@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Report Summary • Web_N2P{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 text-primary mb-1">{{ metadata.name }}</h1>
+    <p class="text-muted mb-0">{{ metadata.customer }} • {{ metadata.scan_date }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('upload_form') }}">Start Over</a>
+    <a class="btn btn-primary" href="{{ url_for('download_report', report_id=report_id) }}">Download PDF</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="metric-card">
+      <div class="metric-label">Total Findings</div>
+      <div class="metric-value">{{ aggregates.total_findings }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="metric-card">
+      <div class="metric-label">Affected Hosts</div>
+      <div class="metric-value">{{ aggregates.affected_hosts }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="metric-card">
+      <div class="metric-label">Average CVSS</div>
+      <div class="metric-value">{{ aggregates.average_cvss or 'n/a' }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 text-primary">Findings by Severity</h2>
+        <img class="img-fluid" src="{{ bundle.charts.severity }}" alt="Severity chart" />
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 text-primary">Risk Factor Distribution</h2>
+        <img class="img-fluid" src="{{ bundle.charts.risks }}" alt="Risk chart" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 text-primary">Top Hosts</h2>
+        <img class="img-fluid" src="{{ bundle.charts.hosts }}" alt="Top hosts chart" />
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h5 text-primary">Top Plugin Families</h2>
+        <img class="img-fluid" src="{{ bundle.charts.families }}" alt="Top plugin families chart" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="mt-5">
+  <h2 class="h4 text-primary mb-3">Host Severity Breakdown</h2>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">Host</th>
+          <th scope="col">IP</th>
+          <th scope="col">Critical</th>
+          <th scope="col">High</th>
+          <th scope="col">Medium</th>
+          <th scope="col">Low</th>
+          <th scope="col">Info</th>
+          <th scope="col">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for host in host_summaries %}
+        <tr>
+          <td>{{ host.host }}</td>
+          <td>{{ host.ip_address or '—' }}</td>
+          {% for label in severity_order %}
+          <td>{{ host.severity_totals[label] }}</td>
+          {% endfor %}
+          <td>{{ host.total_findings }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="mt-5">
+  <h2 class="h4 text-primary mb-3">Notable Findings</h2>
+  <p class="text-muted">Showing the first {{ findings|length }} highest severity findings.</p>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Severity</th>
+          <th scope="col">Host</th>
+          <th scope="col">Plugin</th>
+          <th scope="col">Risk</th>
+          <th scope="col">CVSS</th>
+          <th scope="col">CVEs</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for finding in findings %}
+        <tr>
+          <td><span class="badge severity-{{ finding.severity_label|lower }}">{{ finding.severity_label }}</span></td>
+          <td>{{ finding.host }}</td>
+          <td>{{ finding.plugin_name }}</td>
+          <td>{{ finding.risk_factor }}</td>
+          <td>{{ finding.cvss_base or 'n/a' }}</td>
+          <td>{{ finding.cves|join(', ') if finding.cves else 'None' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
